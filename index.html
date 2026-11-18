@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quête 0527</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page: #E6E0F4;
+  --night: #241F45;
+  --deep: #15122B;
+  --fire: #F6B44B;
+  --fire-dark: #B9741E;
+  --fire-light: #FFD994;
+  --lilac: #C6B5F2;
+  --text: #F4EFE1;
+  --muted: #A49DCB;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --page: #0E0C1E; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --page: #0E0C1E; color-scheme: dark; }
+*, *::before, *::after { box-sizing: inherit; }
+html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; height: 100%;
+  background: var(--page);
+  display: flex; justify-content: center;
+  font-family: "VT323", "Courier New", monospace;
+}
+.screen {
+  position: relative;
+  width: 100%; max-width: 440px; height: 100%;
+  background: var(--deep); color: var(--text);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.scene { position: relative; flex: none; }
+canvas { display: block; width: 100%; aspect-ratio: 160 / 176; max-height: 54vh; object-fit: cover; object-position: center bottom; transition: max-height .4s steps(6); image-rendering: pixelated; image-rendering: crisp-edges; }
+.screen.compact canvas { max-height: 34vh; }
+.px { font-family: "Press Start 2P", "Courier New", monospace; }
+
+.sound {
+  position: absolute; top: 10px; right: 10px;
+  font-family: "Press Start 2P", monospace; font-size: 9px;
+  color: var(--text); background: rgba(21, 18, 43, .7);
+  border: 2px solid var(--lilac); padding: 7px 8px; cursor: pointer;
+}
+.sound:focus-visible, .btn:focus-visible, .panel:focus-visible { outline: 3px solid var(--fire); outline-offset: 2px; }
+
+.title {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding-top: 22%;
+  text-align: center; pointer-events: none;
+}
+.title h1 {
+  margin: 0; font-family: "Press Start 2P", monospace; font-weight: 400;
+  font-size: clamp(20px, 7vw, 28px); line-height: 1.3; color: var(--fire);
+  text-shadow: 3px 3px 0 var(--deep), -1px -1px 0 var(--fire-dark);
+}
+.title p { margin: 10px 0 0; font-size: 20px; color: var(--lilac); text-shadow: 2px 2px 0 var(--deep); }
+
+.panel {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 14px 14px 16px;
+  overflow-y: auto;
+}
+.box {
+  position: relative;
+  background: var(--night);
+  border: 4px solid var(--lilac);
+  box-shadow: 0 0 0 4px var(--deep), 0 0 0 6px var(--muted);
+  margin: 6px;
+  padding: 14px 16px 26px;
+}
+.who { font-family: "Press Start 2P", monospace; font-size: 10px; color: var(--fire); margin-bottom: 10px; }
+.say { font-size: 25px; line-height: 1.12; min-height: 3.4em; }
+.more {
+  position: absolute; right: 12px; bottom: 8px;
+  font-family: "Press Start 2P", monospace; font-size: 9px; color: var(--lilac);
+  animation: blink 1s steps(2, start) infinite;
+}
+.hint { text-align: center; font-size: 20px; color: var(--muted); margin: 4px 0 0; animation: blink 1.2s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+
+.bar { height: 22px; border: 4px solid var(--lilac); background: var(--deep); padding: 2px; }
+.fill { height: 100%; width: 0; background: repeating-linear-gradient(90deg, var(--fire) 0 10px, var(--fire-dark) 10px 12px); }
+.pct { font-family: "Press Start 2P", monospace; font-size: 10px; color: var(--muted); text-align: right; margin-top: 8px; }
+.tip { font-size: 22px; line-height: 1.15; min-height: 2.4em; }
+
+.quest h2 { margin: 0 0 4px; font-family: "Press Start 2P", monospace; font-weight: 400; font-size: 13px; line-height: 1.5; color: var(--fire); }
+.quest .meta { font-size: 20px; color: var(--muted); margin: 0 0 12px; }
+.quest ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.quest li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; font-size: 21px; line-height: 1.1; }
+.quest li::before { content: ""; width: 14px; height: 14px; margin-top: 3px; border: 3px solid var(--lilac); }
+.quest li b { font-weight: 400; color: var(--fire-light); }
+.reward { margin-top: 14px; padding-top: 10px; border-top: 3px dashed var(--muted); font-size: 21px; }
+.reward span { color: var(--fire-light); }
+
+.btn {
+  display: block; width: calc(100% - 12px); margin: 4px 6px 0;
+  font-family: "Press Start 2P", monospace; font-size: 12px; line-height: 1.4;
+  padding: 16px 12px; cursor: pointer;
+  color: var(--deep); background: var(--fire); border: 0;
+  box-shadow: inset -4px -4px 0 var(--fire-dark), inset 4px 4px 0 var(--fire-light), 0 0 0 4px var(--deep);
+}
+.btn:active { transform: translateY(2px); box-shadow: inset 4px 4px 0 var(--fire-dark), 0 0 0 4px var(--deep); }
+.btn.ghost { background: transparent; color: var(--lilac); box-shadow: inset 0 0 0 3px var(--lilac); }
+
+.toast {
+  position: absolute; left: 12px; right: 12px; top: 12px; z-index: 5;
+  display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center;
+  background: var(--deep); border: 4px solid var(--fire);
+  box-shadow: 0 0 0 4px var(--deep);
+  padding: 10px 12px;
+  transform: translateY(-160%); transition: transform .35s steps(5);
+}
+.toast.on { transform: translateY(0); }
+.toast canvas { width: 44px; aspect-ratio: 1; }
+.toast small { display: block; font-family: "Press Start 2P", monospace; font-size: 8px; color: var(--muted); margin-bottom: 6px; }
+.toast strong { font-family: "Press Start 2P", monospace; font-weight: 400; font-size: 12px; color: var(--fire); }
+
+.end { text-align: center; }
+.end .big { font-family: "Press Start 2P", monospace; font-size: clamp(18px, 6vw, 24px); line-height: 1.4; color: var(--fire); margin: 6px 0 12px; text-shadow: 3px 3px 0 var(--deep); }
+.end p { font-size: 24px; line-height: 1.15; margin: 0 0 8px; }
+.end .sign { color: var(--muted); font-size: 20px; }
+
+.flash { position: absolute; inset: 0; background: var(--text); opacity: 0; pointer-events: none; z-index: 4; }
+.flash.go { animation: flash .5s steps(4) forwards; }
+@keyframes flash { 0% { opacity: .9; } 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .more, .hint { animation: none; }
+  .toast { transition: none; }
+  .flash.go { animation: none; }
+}
+
+.opts { display: grid; gap: 12px; margin: 2px 6px 0; }
+.opts[hidden], .gain[hidden], .more[hidden], .hint[hidden] { display: none; }
+.opt {
+  font-family: "VT323", "Courier New", monospace; font-size: 23px; line-height: 1.05; text-align: left;
+  color: var(--text); background: var(--deep); cursor: pointer;
+  border: 0; box-shadow: inset 0 0 0 3px var(--lilac);
+  padding: 13px 14px 13px 40px; position: relative;
+}
+.opt::before { content: "►"; position: absolute; left: 14px; top: 13px; color: var(--fire); font-size: 18px; }
+.opt:active { background: var(--night); }
+.opt:focus-visible, .field input:focus-visible { outline: 3px solid var(--fire); outline-offset: 2px; }
+.gain { margin-top: 10px; font-family: "Press Start 2P", monospace; font-size: 9px; line-height: 1.6; color: var(--fire-light); }
+.field { display: grid; gap: 10px; margin: 0 6px; }
+.field label { font-size: 23px; }
+.field input {
+  font-family: "Press Start 2P", monospace; font-size: 14px; padding: 14px 12px;
+  color: var(--text); background: var(--deep); border: 0; box-shadow: inset 0 0 0 3px var(--lilac);
+  border-radius: 0; -webkit-appearance: none; appearance: none; user-select: text; -webkit-user-select: text;
+}
+.end .reveal { font-size: 23px; color: var(--lilac); }
+</style>
+</head>
+<body>
+<main class="screen" id="screen">
+  <div class="scene">
+    <canvas id="scene" width="160" height="176" aria-label="Un camp de nuit en forêt, en pixel art"></canvas>
+    <div class="title" id="title">
+      <h1>Brumeval</h1>
+      <p>Une aventure en forêt</p>
+    </div>
+    <button class="sound" id="sound" type="button" aria-pressed="true">Son : oui</button>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <canvas id="trophy" width="16" height="16" aria-hidden="true"></canvas>
+    <div><small>Succès débloqué</small><strong id="toastName">Tonton</strong></div>
+  </div>
+  <section class="panel" id="panel" aria-live="polite"></section>
+  <div class="flash" id="flash"></div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Son ---------- */
+  var soundOn = true, actx = null;
+  function audio() {
+    if (!soundOn) return null;
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === "suspended") actx.resume();
+      return actx;
+    } catch (e) { return null; }
+  }
+  function beep(freq, dur, type, vol, when) {
+    var a = audio(); if (!a) return;
+    var t = a.currentTime + (when || 0);
+    var o = a.createOscillator(), g = a.createGain();
+    o.type = type || "square"; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.04, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  function blip() { beep(640 + Math.random() * 90, 0.03, "square", 0.022); }
+  function select() { beep(523, 0.06); beep(784, 0.09, "square", 0.04, 0.06); }
+  function gainSfx() { beep(880, 0.07, "square", 0.035); beep(1175, 0.12, "square", 0.035, 0.07); }
+  function fanfare() {
+    [523, 659, 784, 1047, 784, 1047].forEach(function (f, i) { beep(f, i === 5 ? 0.45 : 0.12, "square", 0.05, i * 0.12); });
+  }
+  var soundBtn = document.getElementById("sound");
+  soundBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    soundOn = !soundOn;
+    soundBtn.textContent = soundOn ? "Son : oui" : "Son : non";
+    soundBtn.setAttribute("aria-pressed", String(soundOn));
+  });
+
+  /* ---------- Scène pixel ---------- */
+  var cv = document.getElementById("scene"), cx = cv.getContext("2d");
+  var W = 160, H = 176, GROUND = 146;
+  var S = { fire: false, travelers: false, bundle: false, baby: false, party: false, spring: false };
+
+  function rect(x, y, w, h, c) { cx.fillStyle = c; cx.fillRect(x, y, w, h); }
+  function sprite(rows, pal, x, y, flip) {
+    for (var r = 0; r < rows.length; r++) for (var k = 0; k < rows[r].length; k++) {
+      var ch = rows[r][flip ? rows[r].length - 1 - k : k];
+      if (ch !== "." && pal[ch]) rect(x + k, y + r, 1, 1, pal[ch]);
+    }
+  }
+  var rnd = (function (s) { return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; })(527);
+  var stars = [], trees = [], grass = [];
+  for (var i = 0; i < 70; i++) stars.push([Math.floor(rnd() * W), Math.floor(rnd() * (GROUND - 30)), rnd()]);
+  for (var t = -4; t < W + 8; t += 7 + Math.floor(rnd() * 6)) trees.push([t, 20 + Math.floor(rnd() * 16), rnd() > 0.5]);
+  for (var g2 = 0; g2 < 40; g2++) grass.push([Math.floor(rnd() * W), GROUND + 2 + Math.floor(rnd() * (H - GROUND - 3))]);
+
+  var MAN = ["..hhhh..", ".hhhhhh.", ".hssssh.", "..ssss..", ".cccccc.", "cccccccc", "ccc.cccc", "cccccccc", ".pppppp.", ".pp..pp.", ".bb..bb."];
+  var WOMAN = ["..hhhh..", ".hhhhhh.", "hhsssshh", "hhsssshh", "h.cccc.h", ".cccccc.", "cccccccc", "cccccccc", ".cccccc.", ".pp..pp.", ".bb..bb."];
+  var HERO = ["...hhhh...", "..hhhhhh..", "..hssssh..", "...ssss...", ".cccccccc.", "cccccccccc", "cccc..cccc", "cccccccccc", "..pppppp..", "..pp..pp..", "..bb..bb.."];
+  var BUNDLE = [".kkkkkk.", "kwwwwwwk", "kwwwwwwk", ".kkkkkk."];
+  var BABY = [".wwww.", "wwssww", "wsssww", "wwssww", ".wwww."];
+  var HEART = [".r.r.", "rrrrr", "rrrrr", ".rrr.", "..r.."];
+  var TENT = ["..........l..........", ".........lll.........", "........lllll........", ".......lllllll.......",
+    "......llllddlll......", ".....lllllddllll.....", "....llllllddlllll....", "...lllllllddllllll...",
+    "..llllllldddlllllll..", ".lllllllldddllllllll.", "llllllllldddlllllllll"];
+  var sparks = [], frame = 0, last = 0;
+
+  function drawScene() {
+    frame++;
+    var bands = S.spring ? ["#1A2350", "#233066", "#2E3E7A", "#3D4D8C", "#5C5F9A"] : ["#141130", "#1A1640", "#211C4C", "#2A2459", "#352C63"];
+    for (var y = 0; y < GROUND; y++) {
+      var f = y / GROUND * (bands.length - 1), b = Math.floor(f), frac = f - b;
+      for (var x = 0; x < W; x++) {
+        var nx = frac > 0.5 ? ((x + y) % 2 === 0 || frac > 0.8) : ((x + y) % 2 === 0 && frac > 0.3);
+        cx.fillStyle = bands[Math.min(b + (nx ? 1 : 0), bands.length - 1)];
+        cx.fillRect(x, y, 1, 1);
+      }
+    }
+    stars.forEach(function (s) {
+      if (reduce || Math.sin(frame * 0.15 + s[2] * 20) > -0.6) rect(s[0], s[1], 1, 1, s[2] > 0.85 ? "#FFE7A3" : "#D9D2F5");
+    });
+    for (var dy = -7; dy <= 7; dy++) for (var dx = -7; dx <= 7; dx++) {
+      if (dx * dx + dy * dy <= 46) rect(130 + dx, 22 + dy, 1, 1, "#EDE6D3");
+      if ((dx - 3) * (dx - 3) + (dy + 2) * (dy + 2) <= 4) rect(130 + dx, 22 + dy, 1, 1, "#CFC6B0");
+    }
+    rect(126, 25, 2, 1, "#CFC6B0");
+    trees.forEach(function (tr) {
+      for (var r = 0; r < tr[1]; r++) {
+        var half = Math.floor(r / 2.6) + (r % 6 === 5 ? 1 : 0);
+        rect(tr[0] - half, GROUND - tr[1] + r, half * 2 + 1, 1, S.spring ? (tr[2] ? "#1F3A2C" : "#274836") : (tr[2] ? "#17251F" : "#1C2D26"));
+        if (S.spring && r > 3 && (r * 7 + tr[0]) % 4 === 0) rect(tr[0] - half + ((r * 5 + tr[0]) % (half * 2 + 1)), GROUND - tr[1] + r, 1, 1, "#E8A3C0");
+      }
+    });
+    rect(0, GROUND, W, H - GROUND, S.spring ? "#23382B" : "#1D2A23");
+    var gc = S.spring ? "#3B5E44" : "#2C4235";
+    grass.forEach(function (g, gi) {
+      rect(g[0], g[1], 1, 1, gc); rect(g[0] + 1, g[1] - 1, 1, 1, gc);
+      if (S.spring && gi % 2 === 0) rect(g[0] + 1, g[1] - 2, 1, 1, ["#F2A7C3", "#FFE7A3", "#F4EFE1", "#C6B5F2"][gi % 4]);
+    });
+    if (S.spring) {
+      for (var ff = 0; ff < 9; ff++) {
+        var fxp = (ff * 37 + Math.round(Math.sin(frame * 0.05 + ff) * 6)) % W;
+        var fyp = GROUND - 8 - (ff * 13) % 40 + Math.round(Math.cos(frame * 0.07 + ff * 2) * 3);
+        if (reduce || Math.sin(frame * 0.2 + ff * 1.7) > -0.2) rect(fxp, fyp, 1, 1, "#D8F28A");
+      }
+    }
+
+    var fx = 80, fy = GROUND + 14;
+    if (S.fire) {
+      for (var hy = -10; hy <= 10; hy++) for (var hx = -30; hx <= 30; hx++) {
+        var d = (hx * hx) / 900 + (hy * hy) / 100;
+        if (d < 1 && (hx + hy) % 2 === 0 && fy + hy > GROUND) rect(fx + hx, fy + hy, 1, 1, d < 0.45 ? "#4A3A2A" : "#33352A");
+      }
+    }
+    sprite(TENT, { l: "#4F6B4F", d: "#203026" }, 8, GROUND - 4);
+
+    if (S.travelers) {
+      sprite(MAN, { h: "#C6B5F2", s: "#E8B996", c: "#3D5A80", p: "#2B2B3A", b: "#5A3A28" }, 52, GROUND + 4);
+      sprite(WOMAN, { h: "#8A5A36", s: "#E8B996", c: "#9C6B8E", p: "#2B2B3A", b: "#5A3A28" }, 62, GROUND + 4);
+      // lanterne
+      rect(70, GROUND + 9, 2, 3, "#FFE7A3"); rect(70, GROUND + 8, 2, 1, "#6B4429");
+    }
+    sprite(HERO, { h: "#E2603B", s: "#D9A27C", c: "#6B8F5E", p: "#2B2B3A", b: "#5A3A28" }, 98, GROUND + 4, true);
+
+    rect(72, GROUND + 23, 17, 3, "#6B4429"); rect(74, GROUND + 22, 13, 1, "#8A5A36"); rect(75, GROUND + 25, 11, 2, "#4E311E");
+    if (S.fire) {
+      for (var c = 0; c < 11; c++) {
+        var h = Math.max(1, Math.round(9 - Math.abs(c - 5) * 1.5 + (reduce ? 0 : Math.random() * 4 - 1.5)));
+        for (var r = 0; r < h; r++) rect(75 + c, GROUND + 22 - r, 1, 1, r < h * 0.35 ? "#FFE7A3" : (r < h * 0.7 ? "#F6B44B" : "#E2603B"));
+      }
+      if (!reduce && Math.random() < (S.party ? 0.9 : 0.35)) sparks.push({ x: 76 + Math.random() * 9, y: GROUND + 12, vy: 0.6 + Math.random() * 0.7, life: 30 + Math.random() * 30, c: Math.random() > 0.5 ? "#FFE7A3" : "#F6B44B" });
+    } else if (!reduce && frame % 3 === 0) {
+      sparks.push({ x: 80 + Math.random() * 2, y: GROUND + 20, vy: 0.3, life: 25, c: "#5B5670" });
+    }
+    sparks = sparks.filter(function (s) {
+      s.y -= s.vy; s.x += Math.sin((s.y + s.life) * 0.3) * 0.4; s.life--;
+      if (s.life > 0 && s.y > 0) { rect(Math.round(s.x), Math.round(s.y), 1, 1, s.c); return true; }
+      return false;
+    });
+
+    if (S.bundle && !S.baby) {
+      var glow = reduce || Math.floor(frame / 5) % 2 === 0;
+      if (glow) { rect(63, GROUND + 15, 10, 1, "#5E5280"); rect(62, GROUND + 16, 1, 4, "#5E5280"); rect(73, GROUND + 16, 1, 4, "#5E5280"); }
+      sprite(BUNDLE, { k: "#8A5A36", w: "#F4EFE1" }, 64, GROUND + 16);
+    }
+    if (S.baby) {
+      sprite(BABY, { w: "#F4EFE1", s: "#E8B996" }, 77, GROUND + 6);
+      if (reduce || Math.floor(frame / 6) % 2 === 0) sprite(HEART, { r: "#F2A7C3" }, 78, GROUND - 2 - (reduce ? 0 : Math.floor((frame % 24) / 8)));
+    }
+  }
+  function loop(ts) { if (ts - last > 110) { last = ts; drawScene(); } requestAnimationFrame(loop); }
+  drawScene(); requestAnimationFrame(loop);
+
+  (function () {
+    var tc = document.getElementById("trophy").getContext("2d");
+    var T = ["................", "...gggggggggg...", ".gggyyyyyyyyggg.", ".g.gyyyyyyyyg.g.", ".g.gyyyyyyyyg.g.",
+      "..ggyyyyyyyygg..", "....gyyyyyyg....", ".....gyyyyg.....", "......gyyg......", ".......gg.......",
+      ".......gg.......", "......gggg......", ".....dddddd.....", ".....dddddd.....", "................", "................"];
+    var P = { g: "#B9741E", y: "#F6B44B", d: "#6B4429" };
+    for (var r = 0; r < 16; r++) for (var k = 0; k < 16; k++) { var ch = T[r][k]; if (P[ch]) { tc.fillStyle = P[ch]; tc.fillRect(k, r, 1, 1); } }
+  })();
+
+  /* ---------- Histoire ---------- */
+  var NAME = "Voyageur";
+  var STORY = [
+    { say: "La nuit tombe sur la forêt de Brumeval. {N} pose son sac au pied d’un vieux chêne." },
+    { ask: "La pluie arrive. Comment monter le camp ?", opts: [
+      ["Tendre un tarp entre deux arbres", "Tendu bien bas, le tarp tient malgré le vent."],
+      ["Construire un abri en branchages", "Deux heures de boulot, mais l’abri est solide comme une cabane."]
+    ], gain: "Compétence abri +1" },
+    { ask: "Il faut du feu. Avec quoi l’allumer ?", opts: [
+      ["Le ferro-cérium", "Trois étincelles, et l’amadou prend. Le feu crépite."],
+      ["Un archet, à l’ancienne", "Les bras brûlent, mais la braise finit par naître."]
+    ], gain: "Compétence feu +1", then: function () { S.fire = true; } },
+    { say: "Au loin, une lanterne se balance entre les arbres. Deux silhouettes approchent.", then: function () { S.travelers = true; } },
+    { who: "Le voyageur", say: "Bonsoir, {N}. On peut partager ton feu ? Ma femme et moi, on vient de loin." },
+    { ask: "Que fais-tu ?", opts: [
+      ["Les inviter à s’asseoir", "Ils posent leurs sacs et tendent les mains vers les flammes."],
+      ["Leur proposer de la bière de sapin", "Lui accepte. Elle refuse poliment : « Pas pour moi en ce moment, merci. »"]
+    ] },
+    { who: "La voyageuse", say: "Mon mari et moi, on transporte quelque chose de précieux. Il ne sera prêt qu’au printemps.", then: function () { S.bundle = true; } },
+    { ask: "Tu demandes :", opts: [
+      ["« C’est un trésor ? »", "Il sourit : « En quelque sorte. Il grandit un peu chaque jour. »"],
+      ["« Je peux le voir ? »", "Elle secoue la tête : « Pas encore. Il faut attendre la saison des fleurs. »"]
+    ] },
+    { who: "Le voyageur", say: "On repassera au printemps, {N}. D’ici là, entraîne-toi : on aura besoin de quelqu’un de solide." },
+    { say: "L’hiver passe. {N} s’entraîne chaque jour au camp. Aux premières fleurs, la lanterne réapparaît entre les arbres.", then: function () {
+      S.spring = true;
+      var fl = document.getElementById("flash");
+      fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go");
+      beep(660, 0.1, "triangle", 0.05); beep(880, 0.1, "triangle", 0.05, 0.1); beep(1320, 0.25, "triangle", 0.05, 0.2);
+    } },
+    { who: "La voyageuse", say: "Nous revoilà. Le chargement est prêt. Montre-nous ce que tu vaux." },
+    { ask: "Épreuve de force : le précieux chargement pèse 3,5 kg et ne doit jamais toucher le sol. Comment le portes-tu ?", opts: [
+      ["À bout de bras, pendant des heures", "Tes bras tremblent. Toutes ces séances de muscu servent enfin à quelque chose."],
+      ["Je fabrique une écharpe de portage avec ma toile", "Il siffle : « Malin. Ça va beaucoup servir. »"]
+    ], gain: "Objet obtenu : écharpe de portage" },
+    { ask: "Épreuve d’endurance : en pleine nuit, des pleurs résonnent dans le camp. Toutes les trois heures.", opts: [
+      ["Chanter doucement près du feu", "Les pleurs se calment. Elle te regarde, émue."],
+      ["Bercer doucement le chargement", "Le calme revient. Elle te regarde, émue."]
+    ], gain: "Endurance +3" },
+    { who: "La voyageuse", say: "Tu ferais un drôle de bon compagnon de route, {N}." },
+    { ask: "Il te tend la main : « Tu veux faire partie du voyage ? »", opts: [
+      ["Oui, évidemment", null],
+      ["Bien sûr que oui", null]
+    ], final: true }
+  ];
+  var TIPS = [
+    "Astuce : un feu se prépare avant la nuit, pas pendant.",
+    "Astuce : un bon tarp se tend bas quand le vent tourne.",
+    "Astuce : garde toujours ton amadou au sec.",
+    "Astuce : ne laisse jamais un camp sans surveillance."
+  ];
+
+  var panel = document.getElementById("panel"), titleEl = document.getElementById("title"), screenEl = document.getElementById("screen");
+  var mode = "start", idx = 0, typing = null, finishTyping = null, pendingResult = null;
+
+  function fill(txt) { return txt.replace(/\{N\}/g, NAME); }
+  function esc(t) { return t.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function setPanel(html) { panel.innerHTML = html; panel.scrollTop = 0; }
+
+  function typeInto(elm, txt, onDone) {
+    if (reduce) { elm.textContent = txt; onDone(); return; }
+    var n = 0;
+    typing = setInterval(function () {
+      n++; elm.textContent = txt.slice(0, n);
+      if (n % 2 === 0 && txt[n - 1] !== " ") blip();
+      if (n >= txt.length) { clearInterval(typing); typing = null; finishTyping = null; onDone(); }
+    }, 34);
+    finishTyping = function () { clearInterval(typing); typing = null; finishTyping = null; elm.textContent = txt; onDone(); };
+  }
+
+  function showStart() {
+    mode = "start"; idx = 0;
+    S.fire = false; S.travelers = false; S.bundle = false; S.baby = false; S.party = false; S.spring = false;
+    screenEl.classList.remove("compact");
+    titleEl.style.display = "flex";
+    setPanel('<div class="box"><div class="say">Une nuit en forêt. Un sac, une toile, un briquet. Et une aventure qui commence.</div></div>' +
+      '<p class="hint">Touche l’écran pour commencer</p>');
+  }
+
+  function showName() {
+    mode = "name";
+    setPanel('<div class="box"><div class="who">Nouvelle partie</div>' +
+      '<div class="field"><label for="hero">Comment s’appelle ton héros ?</label>' +
+      '<input id="hero" type="text" maxlength="12" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Ton prénom"></div></div>' +
+      '<button class="btn" id="go" type="button">Commencer</button>');
+    var input = document.getElementById("hero");
+    input.addEventListener("click", function (e) { e.stopPropagation(); });
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); begin(); } });
+    document.getElementById("go").addEventListener("click", function (e) { e.stopPropagation(); begin(); });
+    function begin() {
+      var v = input.value.trim();
+      NAME = v ? v.charAt(0).toUpperCase() + v.slice(1) : "Voyageur";
+      input.blur(); select(); showLoading();
+    }
+  }
+
+  function showLoading() {
+    mode = "loading";
+    titleEl.style.display = "none";
+    setPanel('<div class="box"><div class="who">Chargement du monde</div><div class="tip" id="tip"></div>' +
+      '<div class="bar" aria-hidden="true"><div class="fill" id="fill"></div></div><div class="pct" id="pct">0 %</div></div>');
+    var fillEl = document.getElementById("fill"), pct = document.getElementById("pct"), tip = document.getElementById("tip");
+    var p = 0, ti = 0; tip.textContent = TIPS[0];
+    var dur = reduce ? 1200 : 4600, t0 = performance.now();
+    (function tick() {
+      if (mode !== "loading") return;
+      var k = Math.min(1, (performance.now() - t0) / dur), st = Math.floor(k * 20) / 20;
+      if (st !== p) { p = st; if (Math.round(p * 20) % 2 === 0) beep(330 + p * 400, 0.03, "square", 0.02); }
+      fillEl.style.width = (p * 100) + "%"; pct.textContent = Math.round(p * 100) + " %";
+      var nti = Math.min(TIPS.length - 1, Math.floor(k * TIPS.length));
+      if (nti !== ti) { ti = nti; tip.textContent = TIPS[ti]; }
+      if (k < 1) requestAnimationFrame(tick); else setTimeout(function () { idx = 0; play(); }, 350);
+    })();
+  }
+
+  function play() {
+    var node = STORY[idx];
+    if (!node) return;
+    if (node.say) {
+      mode = "say";
+      if (node.then) node.then();
+      setPanel('<div class="box"><div class="who">' + esc(node.who || "Récit") + '</div><div class="say" id="say"></div><span class="more" id="more" hidden>▼</span></div>' +
+        (idx === 0 ? '<p class="hint" id="hint" hidden>Touche pour continuer</p>' : ''));
+      var more = document.getElementById("more"), hint = document.getElementById("hint");
+      typeInto(document.getElementById("say"), fill(node.say), function () { more.hidden = false; if (hint) hint.hidden = false; });
+    } else if (node.ask) {
+      mode = "ask";
+      var html = '<div class="box"><div class="who">' + (node.final ? "Le voyageur" : "Choix") + '</div><div class="say" id="say"></div></div><div class="opts" id="opts" hidden>';
+      node.opts.forEach(function (o, i) { html += '<button class="opt" type="button" data-i="' + i + '">' + esc(fill(o[0])) + '</button>'; });
+      html += '</div>';
+      setPanel(html);
+      var opts = document.getElementById("opts");
+      typeInto(document.getElementById("say"), fill(node.ask), function () { opts.hidden = false; });
+      opts.addEventListener("click", function (e) {
+        var b = e.target.closest(".opt"); if (!b) return;
+        e.stopPropagation();
+        choose(node, Number(b.getAttribute("data-i")));
+      });
+    }
+  }
+
+  function choose(node, i) {
+    select();
+    if (node.final) { accept(); return; }
+    if (node.then) node.then();
+    mode = "result";
+    setPanel('<div class="box"><div class="who">Résultat</div><div class="say" id="say"></div>' +
+      (node.gain ? '<div class="gain" id="gain" hidden>' + esc(node.gain) + '</div>' : '') +
+      '<span class="more" id="more" hidden>▼</span></div>');
+    var more = document.getElementById("more"), gain = document.getElementById("gain");
+    typeInto(document.getElementById("say"), fill(node.opts[i][1]), function () {
+      if (gain) { gain.hidden = false; gainSfx(); }
+      more.hidden = false;
+    });
+  }
+
+  function accept() {
+    mode = "end";
+    screenEl.classList.add("compact");
+    var flash = document.getElementById("flash");
+    flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go");
+    fanfare();
+    S.baby = true; S.party = true;
+    document.getElementById("toastName").textContent = "Tonton " + NAME;
+    var toast = document.getElementById("toast");
+    toast.classList.add("on");
+    setTimeout(function () { toast.classList.remove("on"); }, 3800);
+    setTimeout(function () { S.party = false; }, 4000);
+    setPanel('<div class="box end">' +
+      '<div class="big">Tonton ' + esc(NAME) + '</div>' +
+      '<p>Le précieux chargement arrive en mai 2027.</p>' +
+      '<p class="reveal">Les deux voyageurs, ce sont Paul et Jordane.</p>' +
+      '</div>' +
+      '<button class="btn ghost" id="again" type="button">Rejouer</button>');
+    document.getElementById("again").addEventListener("click", function (e) { e.stopPropagation(); select(); showStart(); });
+  }
+
+  function advance() {
+    if (mode === "start") { select(); showName(); return; }
+    if (typing && finishTyping) { finishTyping(); return; }
+    if (mode === "say" || mode === "result") { idx++; select(); play(); }
+  }
+  screenEl.addEventListener("click", advance);
+  document.addEventListener("keydown", function (e) {
+    if (mode === "name") return;
+    if ((e.key === "Enter" || e.key === " ") && (mode === "start" || mode === "say" || mode === "result")) { e.preventDefault(); advance(); }
+  });
+
+  showStart();
+})();
+</script>
+</body>
+</html>
