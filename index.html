@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Quête 0527</title>
+<title>Brumeval</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#15122B">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brumeval">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -28,7 +36,7 @@
 }
 :root[data-theme="dark"] { --page: #0E0C1E; color-scheme: dark; }
 *, *::before, *::after { box-sizing: inherit; }
-html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+html { height: 100%; height: 100dvh; scroll-padding-top: env(safe-area-inset-top, 0px); }
 body {
   margin: 0; height: 100%;
   background: var(--page);
@@ -46,8 +54,17 @@ body {
   touch-action: manipulation;
 }
 .scene { position: relative; flex: none; }
-canvas { display: block; width: 100%; aspect-ratio: 160 / 176; max-height: 54vh; object-fit: cover; object-position: center bottom; transition: max-height .4s steps(6); image-rendering: pixelated; image-rendering: crisp-edges; }
-.screen.compact canvas { max-height: 34vh; }
+canvas { display: block; width: 100%; aspect-ratio: 160 / 176; max-height: 40vh; max-height: 40dvh; object-fit: cover; object-position: center bottom; transition: max-height .4s steps(6); image-rendering: pixelated; image-rendering: crisp-edges; }
+.screen.compact canvas { max-height: 28vh; max-height: 28dvh; }
+@media (max-height: 740px) {
+  canvas { max-height: 32vh; max-height: 32dvh; }
+  .screen.compact canvas { max-height: 22vh; max-height: 22dvh; }
+  .say { font-size: 22px !important; }
+  .opt { font-size: 21px !important; padding-top: 10px !important; padding-bottom: 10px !important; }
+  .opt::before { top: 10px !important; }
+  .box { padding-top: 11px !important; }
+  .panel { gap: 8px !important; padding-top: 10px !important; }
+}
 .px { font-family: "Press Start 2P", "Courier New", monospace; }
 
 .sound {
@@ -86,7 +103,7 @@ canvas { display: block; width: 100%; aspect-ratio: 160 / 176; max-height: 54vh;
   padding: 14px 16px 26px;
 }
 .who { font-family: "Press Start 2P", monospace; font-size: 10px; color: var(--fire); margin-bottom: 10px; }
-.say { font-size: 25px; line-height: 1.12; min-height: 3.4em; }
+.say { font-size: 25px; line-height: 1.12; min-height: 2.3em; }
 .more {
   position: absolute; right: 12px; bottom: 8px;
   font-family: "Press Start 2P", monospace; font-size: 9px; color: var(--lilac);
@@ -482,7 +499,11 @@ canvas { display: block; width: 100%; aspect-ratio: 160 / 176; max-height: 54vh;
       html += '</div>';
       setPanel(html);
       var opts = document.getElementById("opts");
-      typeInto(document.getElementById("say"), fill(node.ask), function () { opts.hidden = false; });
+      typeInto(document.getElementById("say"), fill(node.ask), function () {
+        opts.hidden = false;
+        var lastOpt = opts.lastElementChild;
+        if (lastOpt && lastOpt.scrollIntoView) lastOpt.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+      });
       opts.addEventListener("click", function (e) {
         var b = e.target.closest(".opt"); if (!b) return;
         e.stopPropagation();
@@ -539,6 +560,12 @@ canvas { display: block; width: 100%; aspect-ratio: 160 / 176; max-height: 54vh;
   });
 
   showStart();
+
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
 })();
 </script>
 </body>
